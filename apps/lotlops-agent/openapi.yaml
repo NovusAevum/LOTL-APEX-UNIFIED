@@ -1,0 +1,76 @@
+openapi: 3.0.3
+info:
+  title: LotlOps Agent API
+  version: 1.1.0
+paths:
+  /health:
+    get:
+      responses:
+        '200': { description: OK }
+  /ready:
+    get:
+      responses:
+        '200': { description: Ready }
+  /invoke:
+    post:
+      security:
+        - hmacAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt: { type: string }
+                model: { type: string }
+              required: [prompt]
+      responses:
+        '200':
+          description: OK
+          content: { application/json: { schema: { type: object, properties: { output: { type: string } } } } }
+  /shell:
+    post:
+      security:
+        - hmacAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                command: { type: string }
+              required: [command]
+      responses:
+        '200': { description: OK }
+  /stream:
+    post:
+      security:
+        - hmacAuth: []
+      responses:
+        '200': { description: Stream }
+  /tasks:
+    get:
+      responses:
+        '200': { description: List tasks }
+  /memory/search:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q: { type: string }
+                limit: { type: integer }
+              required: [q]
+      responses:
+        '200': { description: Results }
+components:
+  securitySchemes:
+    hmacAuth:
+      type: apiKey
+      in: header
+      name: x-signature

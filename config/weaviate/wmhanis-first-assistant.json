@@ -1,0 +1,174 @@
+name: My First Assistant
+version: 0.0.19
+schema: v1
+models:
+  - uses: relace/instant-apply
+    with:
+      RELACE_API_KEY: ${{ secrets.RELACE_API_KEY }}
+  - uses: anthropic/claude-3-7-sonnet
+    with:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    override:
+      roles:
+        - chat
+        - edit
+  - uses: anthropic/claude-3-5-haiku
+    with:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    override:
+      roles:
+        - apply
+        - summarize
+        - chat
+  - uses: mistral/codestral
+    with:
+      MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+  - uses: voyageai/rerank-2
+    with:
+      VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+    override:
+      roles:
+        - rerank
+  - uses: voyageai/voyage-code-3
+    with:
+      VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+  - uses: anthropic/claude-4-sonnet
+    with:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  - uses: openai/gpt-4.1
+    with:
+      OPENAI_API_KEY: ${{ secrets.OPWNAI_API_KEY }}
+  - uses: xai/grok-2
+    with:
+      XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+  - uses: google/gemini-2.0-flash
+    with:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  - uses: togetherai/llama-4-scout-instruct-17bx16e
+    with:
+      TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
+context:
+  - uses: continuedev/code-context
+  - uses: continuedev/docs-context
+  - uses: continuedev/diff-context
+  - uses: continuedev/terminal-context
+  - uses: continuedev/problems-context
+  - uses: continuedev/folder-context
+  - uses: continuedev/codebase-context
+  - uses: continuedev/file-context
+  - uses: continuedev/url-context
+  - uses: continuedev/current-file-context
+  - uses: continuedev/repo-map-context
+  - uses: continuedev/open-files-context
+  - uses: continuedev/clipboard-context
+  - uses: continuedev/commits-context
+  - uses: continuedev/os-context
+data:
+  - uses: continuedev/s3-dev-data
+    with:
+      AWS_SERVER_URL: ${{ secrets.AWS_SERVER_URL }}
+  - uses: continuedev/new-relic-dev-data
+    with:
+      NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+  - uses: continuedev/azure-blob-storage-dev-data
+    with:
+      AZURE_SERVER_URL: ${{ secrets.AZURE_SERVER_URL }}
+mcpServers:
+  - uses: anthropic/memory-mcp
+  - uses: docker/mcp-slack
+    with:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_TEAM_ID: ${{ secrets.SLACK_TEAM_ID }}
+  - uses: docker/mcp-github
+    with:
+      GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}
+  - uses: anthropic/github-mcp
+    with:
+      GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}
+  - uses: repomix/repomix-mcp
+rules:
+  - uses: starter/python-rules
+  - uses: starter/angular-rules
+  - uses: starter/nextjs-rules
+  - uses: starter/data-science-rules
+  - uses: starter/pytorch-rules
+  - uses: starter/nuxt-rules
+  - uses: davide-balducci/nestjs-rules
+  - uses: davide-balducci/db-psql-rules
+  - uses: roddsrod/git-rules
+  - uses: starter/security-rules
+  - uses: starter/svelte-rules
+  - uses: genomagames/unity-rules
+  - uses: lancedb/lancedb-rules
+  - uses: starter/django-rules
+  - uses: dlthub/dlt-rules
+  - uses: starter/laravel-rules
+  - uses: peter-mueller/phoenix-rules
+  - uses: starter/solidity-rules
+  - uses: drewsepeczi/airbnb
+  - uses: gitntg/shophydr
+prompts:
+  - uses: starter/test-prompt
+  - uses: continuedev/nextjs-security-review
+  - uses: starter/new-component-prompt
+  - uses: starter/nuxt-new-page
+  - uses: starter/nextjs-api-route-prompt
+  - uses: starter/angular-new-component
+  - uses: starter/review-prompt
+  - uses: starter/pipeline-prompt
+  - uses: starter/eda-prompt
+  - uses: starter/training-loop-prompt
+  - uses: starter/new-module-prompt
+  - uses: starter/equations-prompt
+  - uses: starter/nuxt-page-prompt
+  - uses: starter/pytorch-new-module
+  - uses: starter/svelte-new-component
+  - uses: starter/nextjs-new-page
+  - uses: lancedb/lancedb-table-prompt
+  - uses: starter/unit-test-prompt
+  - uses: jruokola/rag-prompt
+  - uses: starter/prisma-schema-prompt
+  - uses: starter/nextjs-security-api-route-prompt
+  - uses: starter/client-component-prompt
+  - uses: starter/data-validation-prompt
+  - uses: starter/database-schema-prompt
+  - uses: continuedev/nextjs-caching-review
+  - uses: slowbro/terraform-module
+  - uses: starter/auth-prompt
+  - uses: deadcoast/sequential-thinking-workflow
+docs:
+  - uses: starter/python-docs
+  - uses: starter/angular-docs
+  - uses: starter/nextjs-docs
+  - uses: starter/react-docs
+  - uses: starter/rxjs-docs
+  - uses: starter/angular-material-docs
+  - uses: starter/angular-cli-docs
+  - uses: starter/torch-nn-docs
+  - uses: starter/pandas-docs
+  - uses: starter/numpy-docs
+  - uses: starter/pytorch-docs
+  - uses: starter/nuxt-docs
+  - uses: jruokola/langchain-docs
+  - uses: continuedev/vercel-ai-sdk-docs
+  - uses: dbolivar/streamlit-docs
+  - uses: lancedb/lancedb-open-source-docs
+  - uses: starter/jupyter-docs
+  - uses: starter/matplotlib-docs
+  - uses: continuedev/continue-docs
+  - uses: starter/svelte-docs
+  - uses: starter/zod-docs
+  - uses: chris/symfony-docs
+  - uses: starter/rust-docs
+  - uses: starter/ethereum-docs
+  - uses: starter/sveltekit-docs
+  - uses: jruokola/uvicorn-docs
+  - uses: nekomonci/gradle-docs
+  - uses: dbolivar/sqlalchemy-docs
+  - uses: starter/solidity-docs
+  - uses: lakti-ivan/obsidian-dev-docs
+  - uses: starter/vue-docs
+  - uses: cbaigorri/react-testing-library-docs
+  - uses: starter/conda-docs
+  - uses: lancedb/lancedb-enterprise-docs
+

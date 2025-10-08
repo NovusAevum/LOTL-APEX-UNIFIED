@@ -1,0 +1,6 @@
+lotl() {
+  case "" in
+    --init) shift; if [ "" = "apex" ]; then bash "/Users/wmh/AIProjects/LotlOps/run.sh"; else echo "Unknown init target: "; fi ;;
+    *) echo "Usage: lotl --init apex" ;;
+  esac
+}

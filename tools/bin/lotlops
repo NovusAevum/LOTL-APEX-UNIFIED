@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+
+case "$1" in
+  setup)
+    echo "🧠 LotlOps: Initializing full RAG system for General Hanis..."
+    
+    mkdir -p ~/weaviate ~/intel/hanis ~/bin
+    
+    echo "🔧 Pulling Weaviate embedded Docker..."
+    curl -s -L -o ~/weaviate/docker-compose.yml \
+    https://raw.githubusercontent.com/weaviate/weaviate/v1.24.6/docker-compose/docker-compose.embedded.yml
+
+    echo "🐳 Launching Weaviate..."
+    cd ~/weaviate && docker compose up -d && sleep 5
+    
+    echo "📦 Installing Python dependencies..."
+    pip install --upgrade \
+      weaviate-client==4.15.4 \
+      langchain \
+      langchain-community \
+      sentence-transformers \
+      llama-cpp-python
+    
+    echo "🧠 Writing ingest.py..."
+    cat <<EOF > ~/intel/hanis/ingest.py
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import Weaviate
+from weaviate import WeaviateClient
+from weaviate.connect import ConnectionParams
+
+client = WeaviateClient(
+    connection_params=ConnectionParams.from_params(
+        http_host="localhost",
+        http_port=8080,
+        http_secure=False,
+    )
+)
+
+loader = DirectoryLoader("/Users/wmh/intel/hanis", glob="**/*.txt")
+docs = loader.load()
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+Weaviate.from_documents(documents=docs, embedding=embeddings, client=client)
+print("✅ Hanis knowledge ingested into vector memory.")
+EOF
+
+    echo "🧠 Writing query.py..."
+    cat <<EOF > ~/intel/hanis/query.py
+import sys
+from langchain.vectorstores import Weaviate
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.chains import RetrievalQA
+from langchain_community.llms import LlamaCpp
+from weaviate import WeaviateClient
+from weaviate.connect import ConnectionParams
+
+question = " ".join(sys.argv[1:])
+client = WeaviateClient(
+    connection_params=ConnectionParams.from_params(
+        http_host="localhost",
+        http_port=8080,
+        http_secure=False,
+    )
+)
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+vectorstore = Weaviate(client=client, index_name="Document", embedding=embeddings)
+llm = LlamaCpp(
+    model_path="/Users/wmh/models/deepseek-coder.gguf",
+    n_ctx=4096,
+    n_batch=512,
+    temperature=0.7,
+    top_k=40,
+    f16_kv=True,
+    verbose=False,
+)
+qa = RetrievalQA.from_chain_type(llm=llm, retriever=vectorstore.as_retriever())
+print("💡", qa.run(question))
+EOF
+
+    chmod +x ~/intel/hanis/query.py
+
+    echo "✅ All systems go. Now run:"
+    echo "   lotlops ingest     – to push memory into vector store"
+    echo "   lotlops rag \"Your prompt\"  – to ask anything"
+    ;;
+
+  ingest)
+    python3 ~/intel/hanis/ingest.py
+    ;;
+
+  rag)
+    shift
+    python3 ~/intel/hanis/query.py "$*"
+    ;;
+
+  codestral)
+    shift
+    ~/bin/llama -m ~/models/deepseek-coder.gguf --n-gpu-layers 20 --n-batch 512 -p "$*"
+    ;;
+
+  alt)
+    shift
+    echo "$*" | ollama run codellama
+    ;;
+
+  *)
+    echo "Usage: lotlops [setup|ingest|rag|codestral|alt] <prompt>"
+    ;;
+esac

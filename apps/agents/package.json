@@ -1,0 +1,29 @@
+{
+  "name": "@lotl-apex/agents",
+  "version": "1.0.0",
+  "description": "LOTL Apex AI Agents",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.7.0",
+    "bullmq": "^4.15.0",
+    "crewai": "^0.1.0",
+    "ioredis": "^5.3.2",
+    "langchain": "^0.0.200",
+    "ollama": "^0.4.0",
+    "weaviate-ts-client": "^1.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsx": "^4.6.0",
+    "typescript": "^5.3.0"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "text2vec-transformers": {
+    "enabled": true,
+    "endpoint": "http://t2v-transformers:8080"
+  }
+}

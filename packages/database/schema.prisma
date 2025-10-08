@@ -1,0 +1,257 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Identity Engine
+  identityProfile IdentityProfile?
+  sessions        Session[]
+  investigations  Investigation[]
+  agents          Agent[]
+
+  @@map("users")
+}
+
+model IdentityProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Communication patterns
+  communicationStyle Json
+  responsePreferences Json
+  decisionPatterns   Json
+  behaviorMetrics    Json
+
+  // Learning progress
+  learningProgress Float @default(0.0)
+  adaptationLevel  Int   @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("identity_profiles")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("sessions")
+}
+
+model Agent {
+  id          String      @id @default(cuid())
+  name        String
+  type        AgentType
+  status      AgentStatus @default(INACTIVE)
+  description String?
+  config      Json
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tasks     Task[]
+  executions AgentExecution[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("agents")
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  type        TaskType
+  status      TaskStatus @default(PENDING)
+  priority    Priority   @default(MEDIUM)
+  payload     Json
+  result      Json?
+  agentId     String
+  agent       Agent      @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  executions AgentExecution[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  completedAt DateTime?
+
+  @@map("tasks")
+}
+
+model AgentExecution {
+  id       String          @id @default(cuid())
+  agentId  String
+  agent    Agent           @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  taskId   String
+  task     Task            @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  status   ExecutionStatus @default(RUNNING)
+  logs     String[]
+  metrics  Json?
+  error    String?
+
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@map("agent_executions")
+}
+
+model Investigation {
+  id          String             @id @default(cuid())
+  title       String
+  description String?
+  type        InvestigationType
+  status      InvestigationStatus @default(ACTIVE)
+  targets     String[]
+  findings    Json
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  osintData OsintData[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("investigations")
+}
+
+model OsintData {
+  id             String        @id @default(cuid())
+  investigationId String
+  investigation  Investigation @relation(fields: [investigationId], references: [id], onDelete: Cascade)
+  source         String
+  dataType       OsintDataType
+  content        Json
+  confidence     Float         @default(0.0)
+  verified       Boolean       @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@map("osint_data")
+}
+
+model VectorMemory {
+  id        String   @id @default(cuid())
+  namespace String
+  content   String
+  metadata  Json
+  embedding Float[]
+  createdAt DateTime @default(now())
+
+  @@map("vector_memory")
+}
+
+model SystemLog {
+  id        String   @id @default(cuid())
+  level     LogLevel
+  message   String
+  metadata  Json?
+  source    String
+  createdAt DateTime @default(now())
+
+  @@map("system_logs")
+}
+
+// Enums
+enum UserRole {
+  USER
+  ADMIN
+  OPERATOR
+}
+
+enum AgentType {
+  LOTL
+  OSINT
+  SECURITY
+  DATA
+  TASK
+  QUICK
+}
+
+enum AgentStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+  MAINTENANCE
+}
+
+enum TaskType {
+  OSINT_SCAN
+  SECURITY_AUDIT
+  DATA_ANALYSIS
+  RECONNAISSANCE
+  AUTOMATION
+  CUSTOM
+}
+
+enum TaskStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ExecutionStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum InvestigationType {
+  DOMAIN_RECON
+  SOCIAL_MEDIA
+  THREAT_INTEL
+  VULNERABILITY
+  COMPLIANCE
+}
+
+enum InvestigationStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum OsintDataType {
+  DOMAIN_INFO
+  SOCIAL_PROFILE
+  EMAIL
+  PHONE
+  IP_ADDRESS
+  VULNERABILITY
+  BREACH_DATA
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+  FATAL
+}

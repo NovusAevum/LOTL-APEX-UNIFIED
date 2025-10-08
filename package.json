@@ -1,0 +1,41 @@
+{
+  "name": "lotl-apex",
+  "version": "1.0.0",
+  "description": "Sovereign AI System with Multi-Agent Architecture",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "setup": "pnpm install && pnpm docker:up",
+    "db:migrate": "cd packages/database && pnpm db:migrate",
+    "db:seed": "cd packages/database && pnpm db:seed",
+    "agents:start": "cd apps/agents && pnpm start",
+    "ollama:pull": "docker-compose exec ollama ollama pull mistral && docker-compose exec ollama ollama pull codellama && docker-compose exec ollama ollama pull phi3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "prettier": "^3.1.0",
+    "turbo": "^1.11.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.12.0"
+}
