@@ -28,7 +28,10 @@ class ShellExecutor:
         if not self._is_allowed(command):
             return "❌ Command not allowed by policy"
         try:
-            args = shlex.split(command)
+            try:
+                args = shlex.split(command)
+            except ValueError as e:
+                return f"❌ Error: Invalid command format - {str(e)}"
             result = subprocess.run(
                 args,
                 shell=False,
