@@ -23,9 +23,9 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: lotl_apex
-      POSTGRES_USER: lotl_user
-      POSTGRES_PASSWORD: lotl_secure_pass
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./infra/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -60,7 +60,7 @@ services:
     image: semitechnologies/weaviate:1.22.4
     environment:
       QUERY_DEFAULTS_LIMIT: 25
-      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'false'
       PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
       DEFAULT_VECTORIZER_MODULE: 'none'
       ENABLE_MODULES: 'text2vec-transformers,generative-ollama'
@@ -101,11 +101,11 @@ services:
       dockerfile: apps/api/Dockerfile
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://lotl_user:lotl_secure_pass@postgres:5432/lotl_apex
-      REDIS_URL: redis://redis:6379
-      WEAVIATE_URL: http://weaviate:8080
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      WEAVIATE_URL: ${WEAVIATE_URL}
       OLLAMA_URL: http://ollama:11434
-      JWT_SECRET: your-super-secret-jwt-key
+      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - ./apps/api:/app
       - /app/node_modules
@@ -155,9 +155,9 @@ services:
       dockerfile: apps/agents/Dockerfile
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://lotl_user:lotl_secure_pass@postgres:5432/lotl_apex
-      REDIS_URL: redis://redis:6379
-      WEAVIATE_URL: http://weaviate:8080
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      WEAVIATE_URL: ${WEAVIATE_URL}
       OLLAMA_URL: http://ollama:11434
     volumes:
       - ./apps/agents:/app
@@ -194,7 +194,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
     volumes:
       - grafana_data:/var/lib/grafana
       - ./infra/monitoring/grafana:/etc/grafana/provisioning

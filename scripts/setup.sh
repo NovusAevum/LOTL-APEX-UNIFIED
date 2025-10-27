@@ -217,28 +217,9 @@ memory:
 EOF
 
 # Environment variables
-cat > .env << EOF
-# LOTL-APEX Environment Configuration
-LOTL_APEX_ENV=development
-LOTL_APEX_HOME=${LOTL_PATH}
-
-# AI Configuration
-OLLAMA_HOST=http://localhost:11434
-HUGGINGFACE_API_KEY=your_hf_key_here
-MISTRAL_API_KEY=your_mistral_key_here
-
-# Database Configuration
-WEAVIATE_URL=http://localhost:8080
-REDIS_URL=redis://localhost:6379
-
-# Security Configuration
-ENCRYPTION_KEY=generate_secure_key_here
-AUDIT_LOG_LEVEL=INFO
-
-# OSINT Configuration
-OSINT_SAFE_MODE=true
-OSINT_RATE_LIMIT=10
-EOF
+if [ ! -f ".env" ]; then
+    cp .env.example .env
+fi
 
 # Create startup script
 cat > scripts/start-agent.sh << 'EOF'
